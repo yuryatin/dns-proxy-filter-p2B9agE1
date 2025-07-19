@@ -1,4 +1,4 @@
-# DNS proxy filter dns-proxy-filter-p2B9agE1
+# DNS proxy filter dns-proxy-filter-p2B9agE1 for POSIX-compliant environments
 A simple DNS proxy server for filtering DNS requests. The configuration file follows this format:
 ```ini
   [server]
@@ -56,7 +56,9 @@ It displays test results dynamically in the terminal:
 # Constraints
 
 This version does not yet support:
-* Configuration to selectively “not find” or refuse service for specific DNS query types (currently, it affects all standard DNS query types).
-* Configuration that responds to restricted or preconfigured domains with authoritative responses.
-* Handling DNS request packets with multiple queries (only the first query is processed). Consequently, if the client sends a DNS request where a restricted domain appears in the second or later position, the request will be forwarded to an upstream DNS server. If the upstream server is able to fully honor this request, the client will receive that response as if no DNS proxy filter were in place.
-* Although the configuration file format may specify up to three upstream DNS servers, only the first (dns1) is used by the DNS proxy filter. If dns1 is not specified, the default upstream DNS server (1.1.1.1) will be used.
+* non-POSIX-compliant environments,
+* configuration to selectively “not find” or refuse service for specific DNS query types (currently, it affects all standard DNS query types),
+* configuration that responds to restricted or preconfigured domains with authoritative responses,
+* handling DNS request packets with multiple queries (only the first query is processed). Consequently, if the client sends a DNS request where a restricted domain appears in the second or later position, the request will be forwarded to an upstream DNS server. If the upstream server is able to fully honor this request, the client will receive that response as if no DNS proxy filter were in place.
+
+Although the configuration file format may specify up to three upstream DNS servers, only the first (dns1) is used by the DNS proxy filter. If dns1 is not specified, the default upstream DNS server (1.1.1.1) will be used.
