@@ -92,3 +92,4 @@ tags
 # Other
 dns_proxy_prototype.ipynb
 .ipynb_checkpoints/
+.upload.sh
