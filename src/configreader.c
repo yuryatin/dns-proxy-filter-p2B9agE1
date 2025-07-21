@@ -89,7 +89,7 @@ enum boolean isValidDomain(char * domainStart) {
 }
 
 void scanConfigLines(FILE * f, enum boolean reading, Filter * filter, Server * server, UpStream * upStream) {
-    char line[512];
+    char line[BUFFER_SIZE];
     char * p = NULL;
     enum boolean inBlackList = False;
     enum boolean inUpstream = False;
@@ -156,23 +156,23 @@ void scanConfigLines(FILE * f, enum boolean reading, Filter * filter, Server * s
                     server->port = atoi(value);
             } else if (inUpstream) {
                 if (keyIsDNS1(key) && isValidIPv4(value)) {
-                    strncpy(upStream->dns1, value, IPv4LEN);
-                    upStream->dns1ipv6 = False;
+                    strncpy(upStream->dns[0], value, IPv4LEN);
+                    upStream->ipv6[0] = False;
                 } else if (keyIsDNS1(key) && isValidIPv6(value)) {
-                    strncpy(upStream->dns1, value, IPv6LEN);
-                    upStream->dns1ipv6 = True;
+                    strncpy(upStream->dns[0], value, IPv6LEN);
+                    upStream->ipv6[0] = True;
                 } else if (keyIsDNS2(key) && isValidIPv4(value)) {
-                    strncpy(upStream->dns2, value, IPv4LEN);
-                    upStream->dns2ipv6 = False;
+                    strncpy(upStream->dns[1], value, IPv4LEN);
+                    upStream->ipv6[1] = False;
                 } else if (keyIsDNS2(key) && isValidIPv6(value)) {
-                    strncpy(upStream->dns2, value, IPv6LEN);
-                    upStream->dns2ipv6 = True;
+                    strncpy(upStream->dns[1], value, IPv6LEN);
+                    upStream->ipv6[1] = True;
                 }  else if (keyIsDNS3(key) && isValidIPv4(value)) {
-                    strncpy(upStream->dns3, value, IPv4LEN);
-                    upStream->dns3ipv6 = False;
+                    strncpy(upStream->dns[2], value, IPv4LEN);
+                    upStream->ipv6[2] = False;
                 } else if (keyIsDNS3(key) && isValidIPv6(value)) {
-                    strncpy(upStream->dns3, value, IPv6LEN);
-                    upStream->dns3ipv6 = True;
+                    strncpy(upStream->dns[2], value, IPv6LEN);
+                    upStream->ipv6[2] = True;
                 } 
             } else if (inBlackList) {
                 if (isValidDomain(key) && isValidIPv4(value)) {

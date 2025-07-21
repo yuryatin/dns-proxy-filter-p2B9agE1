@@ -5,8 +5,15 @@
 #include "ipsender.h"
 
 const char * configFileName = NULL;
+int n_threads = 0; //1
+
+int sockfd;
+struct sockaddr_in addr;
+struct sockaddr_in upstream_addr[N_UPSTREAM_DNS];
 
 int taskCount = 0;
+int totalTaskCount = 0;
+int upstream_socks[THREAD_POOL_SIZE];
 task_t task_queue[MAX_TASKS];
 pthread_mutex_t queueMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t taskAvailable = PTHREAD_COND_INITIALIZER;
@@ -28,18 +35,16 @@ int main(int argc, char *argv[]) {
         .port = 1053
     };
     UpStream upStream = {
-        .dns1 = "1.1.1.1",
-        .dns2 = "8.8.8.8",
-        .dns3 = "8.8.4.4",
-        .dns1ipv6 = False,
-        .dns2ipv6 = False,
-        .dns3ipv6 = False
+        .dns = {"1.1.1.1", "8.8.8.8", "8.8.4.4"},
+        .ipv6 = {False, False, False}
     };
 
     if (configFileName) loadFiltersAndParams(configFileName, &filter, &server, &upStream);
     printFilters(&filter);
 
-    int sockfd;
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(server.port);
+    addr.sin_addr.s_addr = inet_addr(server.ip);
     char buffer[BUFFER_SIZE];
 
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -47,36 +52,33 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    int upstream_sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (upstream_sock < 0) {
-        perror("socket");
-        exit(EXIT_FAILURE);
-    }
-
-    struct sockaddr_in upstream_addr = {0};
-    upstream_addr.sin_family = AF_INET;
-    upstream_addr.sin_port = htons(53);
-    if (inet_pton(AF_INET, upStream.dns1, &upstream_addr.sin_addr) <= 0) {
-        perror("inet_pton");
-        close(upstream_sock);
-        exit(EXIT_FAILURE);
-    }
-
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(server.port);
-    addr.sin_addr.s_addr = inet_addr(server.ip);
-
     if (bind(sockfd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
         perror("bind");
         close(sockfd);
         exit(EXIT_FAILURE);
     }
 
+    for (int i = 0; i < N_UPSTREAM_DNS; i++) {
+        upstream_addr[i].sin_family = AF_INET;
+        upstream_addr[i].sin_port = htons(53);
+        if (inet_pton(AF_INET, upStream.dns[i], &upstream_addr[i].sin_addr) <= 0) {
+            fprintf(stderr, "inet_pton for upstream dns #%d", i+1);
+            close(sockfd);
+            exit(EXIT_FAILURE);
+        }
+    }
+
     pthread_t threads[THREAD_POOL_SIZE];
-    for (int i = 0; i < THREAD_POOL_SIZE; i++) {
-        pthread_create(&threads[i], NULL, workerThread, NULL);
+    for (n_threads = 0; n_threads < THREAD_POOL_SIZE; n_threads++) {
+        upstream_socks[n_threads] = socket(AF_INET, SOCK_DGRAM, 0);
+        if (upstream_socks[n_threads] < 0) {
+            if (!n_threads) {
+                perror("socket");
+                close(sockfd);
+                exit(EXIT_FAILURE);
+            } else break;
+        }
+        pthread_create(&threads[n_threads], NULL, workerThread, (void *) (intptr_t) upstream_socks[n_threads]);
     }
 
     printf("Listening for UDP packets on %s:%d...\n", server.ip, server.port);
@@ -87,6 +89,9 @@ int main(int argc, char *argv[]) {
     memset(readDomain, 0, sizeof(readDomain));
     memset(readDomain, 0, sizeof(forIPv4));
     memset(readDomain, 0, sizeof(forIPv6));
+
+    unsigned char response[BUFFER_SIZE];
+    memset(response, 0, sizeof(response));
     while (1) {
         struct sockaddr_in sender;
         socklen_t sender_len = sizeof(sender);
@@ -103,8 +108,6 @@ int main(int argc, char *argv[]) {
 
         parseDomainName(buffer, readDomain);
         if(inNotFind(readDomain, &(filter.notFind))) {
-            unsigned char response[512];
-            memset(response, 0, sizeof(response));
             struct DnsHeader * resp_header = (struct DnsHeader *) response;
             resp_header->id = recv_header->id;
 
@@ -118,8 +121,6 @@ int main(int argc, char *argv[]) {
             memcpy(response + DNS_HEADER_SIZE, buffer + DNS_HEADER_SIZE, len - DNS_HEADER_SIZE);
             sendto(sockfd, response, len, 0, (struct sockaddr *) &sender, sender_len);
         } else if(inRefuse(readDomain, &(filter.refuse))) {
-            unsigned char response[512];
-            memset(response, 0, sizeof(response));
             struct DnsHeader * resp_header = (struct DnsHeader *) response;
             resp_header->id = recv_header->id;
 
@@ -138,7 +139,6 @@ int main(int argc, char *argv[]) {
                 perror("malloc for forwardArgs failed");
                 exit(EXIT_FAILURE);
             }
-            forwardArgs->sockfd = sockfd;
             forwardArgs->sender_len = sender_len;
             memcpy(&forwardArgs->sender, &sender, sizeof(struct sockaddr_in));
             forwardArgs->buffer = malloc(len);
@@ -153,13 +153,9 @@ int main(int argc, char *argv[]) {
             } else if(qtype == QTYPE_AAAA && inPreDefinedIPv6(readDomain, &(filter.preDefinedIPv6), forIPv6)) {
                 sendPreDefinedIP(recv_header, forIPv6, forwardArgs, True);
             } else {
-                forwardArgs->upstream_sock = upstream_sock;
-                memset(&forwardArgs->upstream_addr, 0, sizeof(forwardArgs->upstream_addr));
-                forwardArgs->upstream_addr.sin_family = AF_INET;
-                forwardArgs->upstream_addr.sin_port = htons(53);
-                inet_pton(AF_INET, "8.8.8.8", &forwardArgs->upstream_addr.sin_addr);
-
+                forwardArgs->taskCount = totalTaskCount;
                 forwardDNSquery(forward, forwardArgs);
+                ++totalTaskCount;
             }
         }
         printf("Received %zd bytes from %s:%d\n", len,
@@ -168,6 +164,7 @@ int main(int argc, char *argv[]) {
 
     cleanFilter(&filter);
     close(sockfd);
-    close(upstream_sock);
+    for (int i = 0; i < n_threads; i++)
+        close(upstream_socks[i]);
     return 0;
 }

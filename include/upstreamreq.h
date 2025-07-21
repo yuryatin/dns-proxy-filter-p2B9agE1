@@ -10,7 +10,7 @@
 #include <ctype.h>
 
 #define MAX_TASKS 100
-#define THREAD_POOL_SIZE 24
+#define THREAD_POOL_SIZE 1 //24
 
 typedef struct {
     void (* function)(void *);
@@ -23,17 +23,16 @@ extern pthread_mutex_t queueMutex;
 extern pthread_cond_t taskAvailable;
 
 typedef struct {
-    int sockfd;
+    int taskCount;
     struct sockaddr_in sender;
     socklen_t sender_len;
-    struct sockaddr_in upstream_addr;
-    int upstream_sock;
     char * buffer;
     ssize_t len;
+    int upstream_sock;
 } ForwardArgs;
 
 void submitTask(void (* func)(void *), void * arg);
-void * workerThread();
+void * workerThread(void *arg);
 void forward(void * arg);
 void forwardDNSquery(void (* func)(void *), void * arg);
 

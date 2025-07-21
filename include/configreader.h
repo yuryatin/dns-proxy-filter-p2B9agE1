@@ -10,6 +10,7 @@
 #define DNS_HEADER_SIZE 12
 #define QTYPE_A 1
 #define QTYPE_AAAA 28
+#define N_UPSTREAM_DNS 3
 
 typedef struct {
     char domain[DOMLENGTH];
@@ -32,12 +33,8 @@ typedef struct {
 } Server;
 
 typedef struct {
-    char dns1[IPv6LEN];
-    char dns2[IPv6LEN];
-    char dns3[IPv6LEN];
-    enum boolean dns1ipv6;
-    enum boolean dns2ipv6;
-    enum boolean dns3ipv6;
+    char dns[N_UPSTREAM_DNS][IPv6LEN];
+    enum boolean ipv6[N_UPSTREAM_DNS];
 } UpStream;
 
 typedef struct {

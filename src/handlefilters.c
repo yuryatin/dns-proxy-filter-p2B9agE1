@@ -45,7 +45,7 @@ void loadFiltersAndParams(const char * configFileName, Filter * filter, Server *
     scanConfigLines(f, False, filter, server, upStream);
     rewind(f);
     scanConfigLines(f, True, filter, server, upStream);
-    printf("\nThe parameters are loaded:\n\tDNS proxy filter should\n\t\tlisten at \n\t\t\tIP \t%s\n\t\t\tport \t%d\n\t\tforward DNS queries to:\n\t\t\t%s\n\t\t\t%s\n\t\t\t%s\n\n\tIt will\n\t\tnot find \t\t%d domains\n\t\trefuse to serve \t%d domains\n\n\tIt has\n\t\tpreconfigured IPv4 for \t%d domains\n\t\tpreconfigured IPv6 for \t%d domains\n\n", server->ip, server->port, upStream->dns1, upStream->dns2, upStream->dns3, filter->notFind.n, filter->refuse.n, filter->preDefinedIPv4.n, filter->preDefinedIPv6.n);
+    printf("\nThe parameters are loaded:\n\tDNS proxy filter should\n\t\tlisten at \n\t\t\tIP \t%s\n\t\t\tport \t%d\n\t\tforward DNS queries to:\n\t\t\t%s\n\t\t\t%s\n\t\t\t%s\n\n\tIt will\n\t\tnot find \t\t%d domains\n\t\trefuse to serve \t%d domains\n\n\tIt has\n\t\tpreconfigured IPv4 for \t%d domains\n\t\tpreconfigured IPv6 for \t%d domains\n\n", server->ip, server->port, upStream->dns[0], upStream->dns[1], upStream->dns[2], filter->notFind.n, filter->refuse.n, filter->preDefinedIPv4.n, filter->preDefinedIPv6.n);
 }
 
 void cleanFilter(Filter * filter) {

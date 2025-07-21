@@ -1,9 +1,11 @@
 #include "ipsender.h"
 #include "configreader.h"
 
+extern int sockfd;
+
 void sendPreDefinedIP(struct DnsHeader * recv_header, char * forIP, ForwardArgs * senderArgs, enum boolean isIPv6) {
     const char * endOfQuestions = findEndOfQuestions(senderArgs->buffer + DNS_HEADER_SIZE, ntohs(recv_header->qdcount));
-    char response[512];
+    char response[BUFFER_SIZE];
     memset(response, 0, sizeof(response));
     memcpy(response, senderArgs->buffer, senderArgs->len);
 
@@ -52,5 +54,5 @@ void sendPreDefinedIP(struct DnsHeader * recv_header, char * forIP, ForwardArgs 
     hexPrint(senderArgs->buffer, senderArgs->len);
     puts("\tOutcoming package\n");
     hexPrint(response, endOfQuestions - senderArgs->buffer + responseSize); */
-    sendto(senderArgs->sockfd, response, endOfQuestions - senderArgs->buffer + responseSize, 0, (struct sockaddr *) &senderArgs->sender, senderArgs->sender_len);
+    sendto(sockfd, response, endOfQuestions - senderArgs->buffer + responseSize, 0, (struct sockaddr *) &senderArgs->sender, senderArgs->sender_len);
 }
