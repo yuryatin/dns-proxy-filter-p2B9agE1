@@ -57,10 +57,11 @@ dkms.conf
 # debug information files
 *.dwo
 
-# Build directories
+# Build directories and files
 /build/
 /bin/
 /obj/
+dns_proxy_filter_p2B9agE1
 
 # VS Code settings folder
 .vscode/
