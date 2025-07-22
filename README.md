@@ -36,6 +36,10 @@ Alternatively, you may want to add its directory to your PATH to be able to laun
 ```
 export PATH=$PATH:/folder/you/want
 ```
+After the path to the configuration file, you may also specify the number of threads to use.
+```
+./dns_proxy_filter_p2B9agE1 ~/Documents/.config/p2B9agE1.conf 16
+```
 
 # How it works
 
