@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <strings.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 #define DNS_HEADER_SIZE 12
 #define DOMLENGTH 256
@@ -25,6 +26,7 @@ struct DnsHeader {
     uint16_t arcount;   // ARCOUNT
 } __attribute__((packed));
 
+int isValidInteger(const char *str);
 void hexPrint(const void * data, size_t len);
 void parseDomainName(const char * buffer, char * output);
 const char * findEndOfQuestions(const char * startOfQuestions, int nQuestions);

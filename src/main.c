@@ -5,7 +5,7 @@
 #include "ipsender.h"
 
 const char * configFileName = NULL;
-int n_threads = 0; //1
+int n_threads = 0;
 
 int sockfd;
 struct sockaddr_in addr;
@@ -13,7 +13,8 @@ struct sockaddr_in upstream_addr[N_UPSTREAM_DNS];
 
 int taskCount = 0;
 int totalTaskCount = 0;
-int upstream_socks[THREAD_POOL_SIZE];
+int * upstream_socks = NULL;
+int thread_pool_size = 24;
 task_t task_queue[MAX_TASKS];
 pthread_mutex_t queueMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t taskAvailable = PTHREAD_COND_INITIALIZER;
@@ -22,6 +23,11 @@ int main(int argc, char *argv[]) {
 
     if (argc > 1) configFileName = argv[1];
     else puts("No path to a configuration file was provided. Proceeding with Default parameters.");
+
+    if (argc > 2) {
+        int core_n = isValidInteger(argv[2]);
+        if (core_n) thread_pool_size = core_n;
+    }
 
     Filter filter = {
         { .n=0, .domains=NULL },
@@ -68,12 +74,28 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    pthread_t threads[THREAD_POOL_SIZE];
-    for (n_threads = 0; n_threads < THREAD_POOL_SIZE; n_threads++) {
+    pthread_t * threads = malloc(sizeof(pthread_t) * thread_pool_size);
+    if (!threads) {
+        perror("malloc for threads failed");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    upstream_socks = malloc(sizeof(int) * thread_pool_size);
+    if (!upstream_socks) {
+        perror("malloc for upstream_socks failed");
+        free(threads);
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    for (n_threads = 0; n_threads < thread_pool_size; n_threads++) {
         upstream_socks[n_threads] = socket(AF_INET, SOCK_DGRAM, 0);
         if (upstream_socks[n_threads] < 0) {
             if (!n_threads) {
                 perror("socket");
+                free(threads);
+                free(upstream_socks);
                 close(sockfd);
                 exit(EXIT_FAILURE);
             } else break;
@@ -81,7 +103,7 @@ int main(int argc, char *argv[]) {
         pthread_create(&threads[n_threads], NULL, workerThread, (void *) (intptr_t) upstream_socks[n_threads]);
     }
 
-    printf("Listening for UDP packets on %s:%d...\n", server.ip, server.port);
+    printf("Using %d threads. Listening for UDP packets on %s:%d...\n", n_threads, server.ip, server.port);
     
     char readDomain[DOMLENGTH];
     char forIPv4[IPv4LEN];
@@ -137,6 +159,9 @@ int main(int argc, char *argv[]) {
             ForwardArgs * forwardArgs = malloc(sizeof(ForwardArgs));
             if (!forwardArgs) {
                 perror("malloc for forwardArgs failed");
+                free(threads);
+                free(upstream_socks);
+                close(sockfd);
                 exit(EXIT_FAILURE);
             }
             forwardArgs->sender_len = sender_len;
@@ -164,6 +189,11 @@ int main(int argc, char *argv[]) {
 
     cleanFilter(&filter);
     close(sockfd);
+    for (int i = 0; i < n_threads; i++)
+        pthread_cancel(threads[i]);
+    free(threads);
+    free(upstream_socks);
+    pthread_mutex_destroy(&queueMutex);
     for (int i = 0; i < n_threads; i++)
         close(upstream_socks[i]);
     return 0;

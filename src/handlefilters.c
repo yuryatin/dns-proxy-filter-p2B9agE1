@@ -68,4 +68,5 @@ void printFilters(Filter * filter) {
     for (int i = 0; i < filter->preDefinedIPv4.n; ++i ) printf("%32s\t%s\n", filter->preDefinedIPv4.records[i].domain, filter->preDefinedIPv4.records[i].ip);
     puts("\nDomains with pre-defined IPv6:");
     for (int i = 0; i < filter->preDefinedIPv6.n; ++i ) printf("%32s\t%s\n", filter->preDefinedIPv6.records[i].domain, filter->preDefinedIPv6.records[i].ip);
+    puts("");
 }

@@ -1,5 +1,16 @@
 #include "utils.h"
 
+int isValidInteger(const char * str) {
+    long nprocs = sysconf(_SC_NPROCESSORS_ONLN);
+    if (str[0] == '\0') return False;
+    for (int i = 0; str[i]; i++)
+        if (!isdigit((unsigned char)str[i])) return False;
+    int val = atoi(str);
+    if (val <= 1) return False;
+    if ((long) val > (nprocs * 8)) return (int)(nprocs * 8);
+    return val;
+}
+
 void hexPrint(const void * data, size_t len) {
     const unsigned char * byte = (const unsigned char *) data;
     for (size_t i = 0; i < len; i += 16) {

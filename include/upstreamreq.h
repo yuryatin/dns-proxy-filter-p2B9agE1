@@ -10,7 +10,6 @@
 #include <ctype.h>
 
 #define MAX_TASKS 100
-#define THREAD_POOL_SIZE 1 //24
 
 typedef struct {
     void (* function)(void *);
