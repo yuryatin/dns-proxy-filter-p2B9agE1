@@ -22,6 +22,9 @@ After navigating in the terminal to a folder where you’d like to build the app
 ```
 git clone https://github.com/yuryatin/dns-proxy-filter-p2B9agE1.git
 cd dns-proxy-filter-p2B9agE1
+mkdir build
+cd build
+cmake ..
 make
 ```
 The assembled executable will be named ```dns_proxy_filter_p2B9agE1```.
