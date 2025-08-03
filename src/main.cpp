@@ -37,12 +37,12 @@ int main(int argc, char *argv[]) {
     };
     Server server = {
         .ip = "127.0.0.1",
-        .ipv6 = False,
+        .ipv6 = false,
         .port = 1053
     };
     UpStream upStream = {
         .dns = {"1.1.1.1", "8.8.8.8", "8.8.4.4"},
-        .ipv6 = {False, False, False}
+        .ipv6 = {false, false, false}
     };
 
     if (configFileName) loadFiltersAndParams(configFileName, &filter, &server, &upStream);
@@ -74,14 +74,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    pthread_t * threads = malloc(sizeof(pthread_t) * thread_pool_size);
+    pthread_t * threads = (pthread_t *) malloc(sizeof(pthread_t) * thread_pool_size);
     if (!threads) {
         perror("malloc for threads failed");
         close(sockfd);
         exit(EXIT_FAILURE);
     }
 
-    upstream_socks = malloc(sizeof(int) * thread_pool_size);
+    upstream_socks = (int *) malloc(sizeof(int) * thread_pool_size);
     if (!upstream_socks) {
         perror("malloc for upstream_socks failed");
         free(threads);
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
             memcpy(response + DNS_HEADER_SIZE, buffer + DNS_HEADER_SIZE, len - DNS_HEADER_SIZE);
             sendto(sockfd, response, len, 0, (struct sockaddr *) &sender, sender_len);
         } else {
-            ForwardArgs * forwardArgs = malloc(sizeof(ForwardArgs));
+            ForwardArgs * forwardArgs = (ForwardArgs *) malloc(sizeof(ForwardArgs));
             if (!forwardArgs) {
                 perror("malloc for forwardArgs failed");
                 free(threads);
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
             }
             forwardArgs->sender_len = sender_len;
             memcpy(&forwardArgs->sender, &sender, sizeof(struct sockaddr_in));
-            forwardArgs->buffer = malloc(len);
+            forwardArgs->buffer = (char *) malloc(len);
             memcpy(forwardArgs->buffer, buffer, len);
             forwardArgs->len = len;
             
@@ -174,9 +174,9 @@ int main(int argc, char *argv[]) {
             while (*p0 != 0) p0 += (*p0) + 1; p0 += 1;
             uint16_t qtype = ntohs(*(uint16_t *)p0);
             if(qtype == QTYPE_A && inPreDefinedIPv4(readDomain, &(filter.preDefinedIPv4), forIPv4)) {
-                sendPreDefinedIP(recv_header, forIPv4, forwardArgs, False);
+                sendPreDefinedIP(recv_header, forIPv4, forwardArgs, false);
             } else if(qtype == QTYPE_AAAA && inPreDefinedIPv6(readDomain, &(filter.preDefinedIPv6), forIPv6)) {
-                sendPreDefinedIP(recv_header, forIPv6, forwardArgs, True);
+                sendPreDefinedIP(recv_header, forIPv6, forwardArgs, true);
             } else {
                 forwardArgs->taskCount = totalTaskCount;
                 forwardDNSquery(forward, forwardArgs);

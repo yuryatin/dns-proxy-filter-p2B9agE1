@@ -2,11 +2,11 @@
 
 int isValidInteger(const char * str) {
     long nprocs = sysconf(_SC_NPROCESSORS_ONLN);
-    if (str[0] == '\0') return False;
+    if (str[0] == '\0') return false;
     for (int i = 0; str[i]; i++)
-        if (!isdigit((unsigned char)str[i])) return False;
+        if (!isdigit((unsigned char)str[i])) return false;
     int val = atoi(str);
-    if (val <= 1) return False;
+    if (val <= 1) return false;
     if ((long) val > (nprocs * 8)) return (int)(nprocs * 8);
     return val;
 }

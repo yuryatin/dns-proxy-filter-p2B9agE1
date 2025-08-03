@@ -5,6 +5,6 @@
 #include "utils.h"
 #include "upstreamreq.h"
 
-void sendPreDefinedIP(struct DnsHeader * recv_header, char * forIP, ForwardArgs * senderArgs, enum boolean isIPv6);
+void sendPreDefinedIP(struct DnsHeader * recv_header, char * forIP, ForwardArgs * senderArgs, bool isIPv6);
 
 #endif

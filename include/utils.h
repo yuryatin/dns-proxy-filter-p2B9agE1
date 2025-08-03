@@ -14,7 +14,6 @@
 #define BUFFER_SIZE 4096
 
 enum filterType { NFIND, RFSE, IP4C, IP6C };
-enum boolean { False, True };
 
 // DNS header of 12 bytes:
 struct DnsHeader {

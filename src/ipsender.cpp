@@ -3,7 +3,7 @@
 
 extern int sockfd;
 
-void sendPreDefinedIP(struct DnsHeader * recv_header, char * forIP, ForwardArgs * senderArgs, enum boolean isIPv6) {
+void sendPreDefinedIP(struct DnsHeader * recv_header, char * forIP, ForwardArgs * senderArgs, bool isIPv6) {
     const char * endOfQuestions = findEndOfQuestions(senderArgs->buffer + DNS_HEADER_SIZE, ntohs(recv_header->qdcount));
     char response[BUFFER_SIZE];
     memset(response, 0, sizeof(response));

@@ -28,13 +28,13 @@ typedef struct {
 
 typedef struct {
     char ip[IPv6LEN];
-    enum boolean ipv6;
+    bool ipv6;
     int port;
 } Server;
 
 typedef struct {
     char dns[N_UPSTREAM_DNS][IPv6LEN];
-    enum boolean ipv6[N_UPSTREAM_DNS];
+    bool ipv6[N_UPSTREAM_DNS];
 } UpStream;
 
 typedef struct {
@@ -64,17 +64,17 @@ typedef struct {
     ArrayPreDefinedIPv6 preDefinedIPv6;
 } Filter;
 
-enum boolean keyIsListenAddress(const char * key);
-enum boolean keyIsListenPort(const char * key);
-enum boolean keyIsDNS1(const char * key);
-enum boolean keyIsDNS2(const char * key);
-enum boolean keyIsDNS3(const char * key);
-enum boolean valueIsNotFind(const char * value);
-enum boolean valueIsRefuse(const char * value);
-enum boolean isValidPort(const char * port);
-enum boolean isValidIPv4(const char *ip);
-enum boolean isValidIPv6(const char *ip);
-enum boolean isValidDomain(char * domainStart);
-void scanConfigLines(FILE * f, enum boolean reading, Filter * filter,   Server * server, UpStream * upStream);
+bool keyIsListenAddress(const char * key);
+bool keyIsListenPort(const char * key);
+bool keyIsDNS1(const char * key);
+bool keyIsDNS2(const char * key);
+bool keyIsDNS3(const char * key);
+bool valueIsNotFind(const char * value);
+bool valueIsRefuse(const char * value);
+bool isValidPort(const char * port);
+bool isValidIPv4(const char *ip);
+bool isValidIPv6(const char *ip);
+bool isValidDomain(char * domainStart);
+void scanConfigLines(FILE * f, bool reading, Filter * filter,   Server * server, UpStream * upStream);
 
 #endif
