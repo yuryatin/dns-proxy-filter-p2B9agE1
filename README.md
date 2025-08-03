@@ -55,7 +55,7 @@ With the Python package dnstester-qboxxbyh (https://github.com/yuryatin/dnsteste
 This package is available for standard installation via ```pip``` from the PyPI repository.
 It displays test results dynamically in the terminal:
 
-![Example screenshot](https://raw.githubusercontent.com/yuryatin/dnstester-qboxxbyh/main/pics/updated_test_results.png)
+<img width="579" height="776" alt="updated_test_results" src="https://github.com/user-attachments/assets/25016c5a-9f60-452c-a367-f22991c22c11" />
 
 # Constraints
 
