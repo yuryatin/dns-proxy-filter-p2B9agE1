@@ -47,7 +47,9 @@ void parseDomainName(const char * buffer, char * output) {
 
 const char * findEndOfQuestions(const char * startOfQuestions, int nQuestions) {
     const char * p = startOfQuestions;
-    for (int i = 0; i < nQuestions; ++i)
-        while (*p != 0) p += (*p) + 1; p += 5;
+    for (int i = 0; i < nQuestions; ++i) {
+        while (*p != 0) p += (*p) + 1;
+        p += 5;
+    }
     return p;
 }

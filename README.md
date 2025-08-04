@@ -20,7 +20,7 @@ A simple DNS proxy server for filtering DNS requests. The configuration file fol
 
 After navigating in the terminal to a folder where you’d like to build the app, you can assemble it on macOS or Linux using the following commands:
 ```
-git clone https://github.com/yuryatin/dns-proxy-filter-p2B9agE1.git
+git clone --branch c https://github.com/yuryatin/dns-proxy-filter-p2B9agE1.git
 cd dns-proxy-filter-p2B9agE1
 make
 ```
