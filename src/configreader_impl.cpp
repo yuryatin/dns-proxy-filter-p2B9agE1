@@ -92,7 +92,7 @@ bool isValidDomain(char * domainStart) {
     return true;
 }
 
-void scanConfigLines(FILE * f, bool reading, Filter * filter, Server * server, UpStream * upStream) {
+void scanConfigLines(FILE * f, bool reading, Κάθαρσις * filter, Server * server, UpStream * upStream) {
     char line[BUFFER_SIZE];
     char * p = nullptr;
     bool inBlackList = false;

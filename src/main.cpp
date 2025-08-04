@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
         if (core_n) thread_pool_size = core_n;
     }
 
-    Filter filter = {
+    Κάθαρσις filter = {
         { .n=0, .domains=nullptr },
         { .n=0, .domains=nullptr },
         { .n=0, .records=nullptr },

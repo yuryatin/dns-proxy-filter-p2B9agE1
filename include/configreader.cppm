@@ -59,7 +59,7 @@ export typedef struct {
     Refuse refuse;
     ArrayPreDefinedIPv4 preDefinedIPv4;
     ArrayPreDefinedIPv6 preDefinedIPv6;
-} Filter;
+} Κάθαρσις;
 
 export [[nodiscard]] bool keyIsListenAddress(const char * key);
 export [[nodiscard]] bool keyIsListenPort(const char * key);
@@ -72,4 +72,4 @@ export [[nodiscard]] bool isValidPort(const char * port);
 export [[nodiscard]] bool isValidIPv4(const char *ip);
 export [[nodiscard]] bool isValidIPv6(const char *ip);
 export [[nodiscard]] bool isValidDomain(char * domainStart);
-export void scanConfigLines(FILE * f, bool reading, Filter * filter, Server * server, UpStream * upStream);
+export void scanConfigLines(FILE * f, bool reading, Κάθαρσις * filter, Server * server, UpStream * upStream);

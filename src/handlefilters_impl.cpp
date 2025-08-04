@@ -45,7 +45,7 @@ bool inPreDefinedIPv6(const char * domain, ArrayPreDefinedIPv6 * arrayPreDefined
     return false;
 }
 
-void loadFiltersAndParams(const char * configFileName, Filter * filter, Server * server, UpStream * upStream) {
+void loadFiltersAndParams(const char * configFileName, Κάθαρσις * filter, Server * server, UpStream * upStream) {
     FILE * f = fopen(configFileName, "r");
     if (f == nullptr) {
         perror("The DNS proxy filter cannot access the configuration file you may have provided when launching the proxy. This could be due to one of the following reasons:\n\t(1) DNS proxy filter is not authorized to read the file\n\t(2) the file path was not specified as the first parameter\n\t(3) the provided file path is incorrect\n\nDNS proxy filter will proceed with default settings. No domains will be filtered.");
@@ -57,7 +57,7 @@ void loadFiltersAndParams(const char * configFileName, Filter * filter, Server *
     println("\nThe parameters are loaded:\n\tDNS proxy filter should\n\t\tlisten at \n\t\t\tIP \t{}\n\t\t\tport \t{}\n\t\tforward DNS queries to:\n\t\t\t{}\n\t\t\t{}\n\t\t\t{}\n\n\tIt will\n\t\tnot find \t\t{} domains\n\t\trefuse to serve \t{} domains\n\n\tIt has\n\t\tpreconfigured IPv4 for \t{} domains\n\t\tpreconfigured IPv6 for \t{} domains\n", server->ip, server->port, upStream->dns[0], upStream->dns[1], upStream->dns[2], filter->notFind.n, filter->refuse.n, filter->preDefinedIPv4.n, filter->preDefinedIPv6.n);
 }
 
-void cleanFilter(Filter * filter) {
+void cleanFilter(Κάθαρσις * filter) {
     free(filter->notFind.domains);
     filter->notFind.domains = nullptr;
     free(filter->refuse.domains);
@@ -68,7 +68,7 @@ void cleanFilter(Filter * filter) {
     filter->preDefinedIPv6.records = nullptr;
 }
 
-void printFilters(Filter * filter) {
+void printFilters(Κάθαρσις * filter) {
     println("\tThe filters\nDomains not to find:");
     for (int i : vw::iota(0, filter->notFind.n)) print("{}\t", filter->notFind.domains[i].domain);
     println("\n\nDomains to refuse:");
