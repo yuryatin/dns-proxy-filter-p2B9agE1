@@ -47,7 +47,7 @@ bool inPreDefinedIPv6(const char * domain, ArrayPreDefinedIPv6 * arrayPreDefined
 
 void loadFiltersAndParams(const char * configFileName, Filter * filter, Server * server, UpStream * upStream) {
     FILE * f = fopen(configFileName, "r");
-    if (f == NULL) {
+    if (f == nullptr) {
         perror("The DNS proxy filter cannot access the configuration file you may have provided when launching the proxy. This could be due to one of the following reasons:\n\t(1) DNS proxy filter is not authorized to read the file\n\t(2) the file path was not specified as the first parameter\n\t(3) the provided file path is incorrect\n\nDNS proxy filter will proceed with default settings. No domains will be filtered.");
         return;
     }
@@ -59,13 +59,13 @@ void loadFiltersAndParams(const char * configFileName, Filter * filter, Server *
 
 void cleanFilter(Filter * filter) {
     free(filter->notFind.domains);
-    filter->notFind.domains = NULL;
+    filter->notFind.domains = nullptr;
     free(filter->refuse.domains);
-    filter->refuse.domains = NULL;
+    filter->refuse.domains = nullptr;
     free(filter->preDefinedIPv4.records);
-    filter->preDefinedIPv4.records = NULL;
+    filter->preDefinedIPv4.records = nullptr;
     free(filter->preDefinedIPv6.records);
-    filter->preDefinedIPv6.records = NULL;
+    filter->preDefinedIPv6.records = nullptr;
 }
 
 void printFilters(Filter * filter) {

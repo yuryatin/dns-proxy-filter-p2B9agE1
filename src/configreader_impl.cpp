@@ -52,7 +52,7 @@ bool isValidPort(const char * port) {
         if (!isdigit((unsigned char)port[i]))
             return false;
     }
-    long intPort = strtol(port, NULL, 10);
+    long intPort = strtol(port, nullptr, 10);
     return intPort > 0 && intPort < 65536;
 }
 
@@ -94,7 +94,7 @@ bool isValidDomain(char * domainStart) {
 
 void scanConfigLines(FILE * f, bool reading, Filter * filter, Server * server, UpStream * upStream) {
     char line[BUFFER_SIZE];
-    char * p = NULL;
+    char * p = nullptr;
     bool inBlackList = false;
     bool inUpstream = false;
     bool inServer = false;

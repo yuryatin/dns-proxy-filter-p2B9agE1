@@ -47,12 +47,12 @@ void sendPreDefinedIP(DnsHeader * recv_header, char * forIP, ForwardArgs * sende
         struct in6_addr ip6_addr;
         inet_pton(AF_INET6, forIP, &ip6_addr);
         memcpy(p, &ip6_addr, 16); //p += 16;
-        responseSize = 28;
+        responseSize = 28uz;
     } else {    // RDATA = IPv4 address in 4 bytes
         struct in_addr ip_addr;
         inet_pton(AF_INET, forIP, &ip_addr);
         memcpy(p, &ip_addr, 4); //p += 4;
-        responseSize = 16;
+        responseSize = 16uz;
     }
 /*  puts("\n\tIncoming package\n");
     hexPrint(senderArgs->buffer, senderArgs->len);

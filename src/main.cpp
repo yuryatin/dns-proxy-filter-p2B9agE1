@@ -26,7 +26,7 @@ using std::cerr;
 using std::array;
 namespace vw = std::views;
 
-const char * configFileName = NULL;
+const char * configFileName = nullptr;
 int n_threads = 0;
 
 int sockfd;
@@ -52,7 +52,7 @@ void * workerThread(void *arg) {
         ((ForwardArgs *)task.arg)->upstream_sock = upstream_sock;
         task.function(task.arg);
     }
-    return NULL;
+    return nullptr;
 }
 
 int main(int argc, char *argv[]) {
@@ -66,10 +66,10 @@ int main(int argc, char *argv[]) {
     }
 
     Filter filter = {
-        { .n=0, .domains=NULL },
-        { .n=0, .domains=NULL },
-        { .n=0, .records=NULL },
-        { .n=0, .records=NULL }
+        { .n=0, .domains=nullptr },
+        { .n=0, .domains=nullptr },
+        { .n=0, .records=nullptr },
+        { .n=0, .records=nullptr }
     };
     Server server = {
         .ip = "127.0.0.1",
@@ -119,20 +119,20 @@ int main(int argc, char *argv[]) {
 
     std::vector<int> upstream_socks(thread_pool_size);
 
-    for (auto n_thread : vw::iota(0, thread_pool_size) ) {
-        upstream_socks.at(n_thread) = socket(AF_INET, SOCK_DGRAM, 0);
-        if (upstream_socks[n_thread] < 0) {
-            if (!n_thread) {
+    for (; n_threads < thread_pool_size; ++n_threads) {
+        upstream_socks.at(n_threads) = socket(AF_INET, SOCK_DGRAM, 0);
+        if (upstream_socks[n_threads] < 0) {
+            if (!n_threads) {
                 perror("socket");
                 free(threads);
                 close(sockfd);
                 exit(EXIT_FAILURE);
             } else break;
         }
-        pthread_create(&threads[n_thread], NULL, workerThread, (void *) (intptr_t) upstream_socks.at(n_thread));
+        pthread_create(&threads[n_threads], nullptr, workerThread, (void *) (intptr_t) upstream_socks.at(n_threads));
     }
 
-    println("Using {} threads. Listening for UDP packets on {}:{}...", n_threads, server.ip, server.port);
+    println("Using {} threads. \N{GLOBE WITH MERIDIANS} Listening for UDP packets on {}:{}...", n_threads, server.ip, server.port);
     
     char readDomain[DOMLENGTH];
     char forIPv4[IPv4LEN];

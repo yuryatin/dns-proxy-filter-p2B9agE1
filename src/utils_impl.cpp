@@ -29,14 +29,14 @@ int isValidInteger(const char * str) {
 
 void hexPrint(const void * data, std::size_t len) {
     const unsigned char * byte = (const unsigned char *) data;
-    for (std::size_t i = 0; i < len; i += 16) {
+    for (std::size_t i = 0uz; i < len; i += 16uz) {
         print("{:04x}  ", i);
-        for (std::size_t j : vw::iota(0, 16)) {
+        for (std::size_t j : vw::iota(0uz, 16uz)) {
             if (i + j < len) print("{:02x} ", byte[i + j]);
             else print("   ");
         }
         print("\t");
-        for (std::size_t j : vw::iota(0, 16)) {
+        for (std::size_t j : vw::iota(0uz, 16uz)) {
             if (i + j < len) {
                 unsigned char c = byte[i + j];
                 print("{}", isprint(c) ? c : '.');
@@ -49,7 +49,7 @@ void hexPrint(const void * data, std::size_t len) {
 
 void parseDomainName(const char * buffer, char * output) {
     std::size_t pos = DNS_HEADER_SIZE;
-    std::size_t end = 0;
+    std::size_t end = 0uz;
     while (buffer[pos] != 0) {
         int label_len = buffer[pos++];
         for ([[maybe_unused]] int _ : vw::iota(0, label_len))

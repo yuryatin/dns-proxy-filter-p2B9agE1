@@ -4,8 +4,8 @@ import <cstdio>;
 
 import utils;
 
-export inline constexpr std::size_t IPv4LEN = 16;
-export inline constexpr std::size_t IPv6LEN = 40;
+export inline constexpr std::size_t IPv4LEN = 16uz;
+export inline constexpr std::size_t IPv6LEN = 40uz;
 export inline constexpr int QTYPE_A = 1;
 export inline constexpr int QTYPE_AAAA = 28;
 
@@ -61,15 +61,15 @@ export typedef struct {
     ArrayPreDefinedIPv6 preDefinedIPv6;
 } Filter;
 
-export bool keyIsListenAddress(const char * key);
-export bool keyIsListenPort(const char * key);
-export bool keyIsDNS1(const char * key);
-export bool keyIsDNS2(const char * key);
-export bool keyIsDNS3(const char * key);
-export bool valueIsNotFind(const char * value);
-export bool valueIsRefuse(const char * value);
-export bool isValidPort(const char * port);
-export bool isValidIPv4(const char *ip);
-export bool isValidIPv6(const char *ip);
-export bool isValidDomain(char * domainStart);
+export [[nodiscard]] bool keyIsListenAddress(const char * key);
+export [[nodiscard]] bool keyIsListenPort(const char * key);
+export [[nodiscard]] bool keyIsDNS1(const char * key);
+export [[nodiscard]] bool keyIsDNS2(const char * key);
+export [[nodiscard]] bool keyIsDNS3(const char * key);
+export [[nodiscard]] bool valueIsNotFind(const char * value);
+export [[nodiscard]] bool valueIsRefuse(const char * value);
+export [[nodiscard]] bool isValidPort(const char * port);
+export [[nodiscard]] bool isValidIPv4(const char *ip);
+export [[nodiscard]] bool isValidIPv6(const char *ip);
+export [[nodiscard]] bool isValidDomain(char * domainStart);
 export void scanConfigLines(FILE * f, bool reading, Filter * filter, Server * server, UpStream * upStream);
