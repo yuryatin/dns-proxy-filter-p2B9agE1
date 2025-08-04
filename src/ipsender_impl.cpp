@@ -1,9 +1,12 @@
-#include "ipsender.h"
-#include "configreader.h"
+module ipsender;
 
-extern int sockfd;
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <cstring>
 
-void sendPreDefinedIP(struct DnsHeader * recv_header, char * forIP, ForwardArgs * senderArgs, bool isIPv6) {
+import configreader;
+
+void sendPreDefinedIP(DnsHeader * recv_header, char * forIP, ForwardArgs * senderArgs, bool isIPv6, const int & sockfd) {
     const char * endOfQuestions = findEndOfQuestions(senderArgs->buffer + DNS_HEADER_SIZE, ntohs(recv_header->qdcount));
     char response[BUFFER_SIZE];
     memset(response, 0, sizeof(response));

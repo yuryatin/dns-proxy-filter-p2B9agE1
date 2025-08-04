@@ -1,8 +1,20 @@
-#include "handlefilters.h"
-#include "upstreamreq.h"
-#include "utils.h"
-#include "configreader.h"
-#include "ipsender.h"
+import handlefilters;
+import upstreamreq;
+import utils;
+import configreader;
+import ipsender;
+import <cstddef>;
+
+#include <unistd.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <pthread.h>
+
+#include <cstring>
+#include <cstdio>
+#include <cctype>
+#include <cstdlib>
 
 const char * configFileName = NULL;
 int n_threads = 0;
@@ -18,6 +30,21 @@ int thread_pool_size = 24;
 task_t task_queue[MAX_TASKS];
 pthread_mutex_t queueMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t taskAvailable = PTHREAD_COND_INITIALIZER;
+
+void * workerThread(void *arg) {
+    int upstream_sock = (int) (intptr_t) arg;
+    while (1) {
+        pthread_mutex_lock(&queueMutex);
+        while (taskCount == 0) {
+            pthread_cond_wait(&taskAvailable, &queueMutex);
+        }
+        task_t task = task_queue[--taskCount];
+        pthread_mutex_unlock(&queueMutex);
+        ((ForwardArgs *)task.arg)->upstream_sock = upstream_sock;
+        task.function(task.arg);
+    }
+    return NULL;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -156,14 +183,18 @@ int main(int argc, char *argv[]) {
             memcpy(response + DNS_HEADER_SIZE, buffer + DNS_HEADER_SIZE, len - DNS_HEADER_SIZE);
             sendto(sockfd, response, len, 0, (struct sockaddr *) &sender, sender_len);
         } else {
-            ForwardArgs * forwardArgs = (ForwardArgs *) malloc(sizeof(ForwardArgs));
-            if (!forwardArgs) {
-                perror("malloc for forwardArgs failed");
-                free(threads);
-                free(upstream_socks);
-                close(sockfd);
-                exit(EXIT_FAILURE);
-            }
+            ForwardArgs * forwardArgs = new ForwardArgs(sockfd,
+                                                        &taskCount,
+                                                        upstream_addr,
+                                                        task_queue,
+                                                        &queueMutex,
+                                                        &taskAvailable);
+            
+            for (int dns = 0; dns < N_UPSTREAM_DNS; ++dns)
+                forwardArgs->upstream_addr[dns] = upstream_addr[dns];
+            for (int ta = 0; ta < MAX_TASKS; ++ta)
+                forwardArgs->task_queue[ta] = task_queue[ta];
+
             forwardArgs->sender_len = sender_len;
             memcpy(&forwardArgs->sender, &sender, sizeof(struct sockaddr_in));
             forwardArgs->buffer = (char *) malloc(len);
@@ -174,9 +205,9 @@ int main(int argc, char *argv[]) {
             while (*p0 != 0) p0 += (*p0) + 1; p0 += 1;
             uint16_t qtype = ntohs(*(uint16_t *)p0);
             if(qtype == QTYPE_A && inPreDefinedIPv4(readDomain, &(filter.preDefinedIPv4), forIPv4)) {
-                sendPreDefinedIP(recv_header, forIPv4, forwardArgs, false);
+                sendPreDefinedIP(recv_header, forIPv4, forwardArgs, false, sockfd);
             } else if(qtype == QTYPE_AAAA && inPreDefinedIPv6(readDomain, &(filter.preDefinedIPv6), forIPv6)) {
-                sendPreDefinedIP(recv_header, forIPv6, forwardArgs, true);
+                sendPreDefinedIP(recv_header, forIPv6, forwardArgs, true, sockfd);
             } else {
                 forwardArgs->taskCount = totalTaskCount;
                 forwardDNSquery(forward, forwardArgs);

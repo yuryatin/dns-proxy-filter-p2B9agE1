@@ -1,12 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+module configreader;
+
 #include <unistd.h>
-#include <ctype.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include "configreader.h"
+
+import utils;
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
 
 bool keyIsListenAddress(const char * key) {
     if (strncmp(key, "listen_address", 16) == 0) return true;

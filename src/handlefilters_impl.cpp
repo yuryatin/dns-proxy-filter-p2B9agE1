@@ -1,8 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <strings.h>
-#include "configreader.h"
-#include "utils.h"
+module handlefilters;
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+import configreader;
+import utils;
 
 bool inNotFind(const char * domain, NotFind * notFind) {
     for (int i = 0; i < notFind->n; ++i)

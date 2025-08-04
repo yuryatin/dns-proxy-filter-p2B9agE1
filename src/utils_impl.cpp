@@ -1,4 +1,13 @@
-#include "utils.h"
+module utils;
+
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <strings.h>
+
+#include <cstring>
+#include <cstdio>
+#include <cctype>
+#include <cstdlib>
 
 int isValidInteger(const char * str) {
     long nprocs = sysconf(_SC_NPROCESSORS_ONLN);
@@ -32,8 +41,8 @@ void hexPrint(const void * data, size_t len) {
 }
 
 void parseDomainName(const char * buffer, char * output) {
-    int pos = DNS_HEADER_SIZE;
-    int end = 0;
+    size_t pos = DNS_HEADER_SIZE;
+    size_t end = 0;
     while (buffer[pos] != 0) {
         int label_len = buffer[pos++];
         for (int i = 0; i < label_len; i++)
@@ -47,7 +56,9 @@ void parseDomainName(const char * buffer, char * output) {
 
 const char * findEndOfQuestions(const char * startOfQuestions, int nQuestions) {
     const char * p = startOfQuestions;
-    for (int i = 0; i < nQuestions; ++i)
-        while (*p != 0) p += (*p) + 1; p += 5;
+    for (int i = 0; i < nQuestions; ++i) {
+        while (*p != 0) p += (*p) + 1;
+        p += 5;
+    }
     return p;
 }

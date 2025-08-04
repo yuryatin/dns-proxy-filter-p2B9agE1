@@ -18,29 +18,48 @@ A simple DNS proxy server for filtering DNS requests. The configuration file fol
 
 # Installation
 
-After navigating in the terminal to a folder where you’d like to build the app, you can assemble it on macOS or Linux using the following commands:
+This project uses C++20 modules and C++23 features. It therefore depends on CMake and Ninja (to handle dependencies).
+To install Ninja: 
+```bash
+brew install ninja
 ```
-git clone https://github.com/yuryatin/dns-proxy-filter-p2B9agE1.git
+or (for example, on Debian/Ubuntu Linux):
+```bash
+sudo apt update
+sudo apt install ninja-build
+```
+Because of the modules and dependency management, this project also requires a recent version of Clang that supports automatic module dependency handling. On macOS and many Linux distributions, you may need to install or update Clang.
+
+Assuming LLVM Clang is installed at `/opt/homebrew/opt/llvm/bin/`, navigate in the terminal to the folder where you want to build the app, then run the following commands (adjust the path `/opt/homebrew/opt/llvm/bin/` as needed):
+```bash
+git clone --branch main https://github.com/yuryatin/dns-proxy-filter-p2B9agE1.git
 cd dns-proxy-filter-p2B9agE1
 mkdir build
 cd build
-cmake ..
-make
+cmake -G Ninja -DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm/bin/clang++  -DCMAKE_CXX_STANDARD=23 -DCMAKE_CXX_SCAN_FOR_MODULES=ON ..
+ninja
 ```
-The assembled executable will be named ```dns_proxy_filter_p2B9agE1```.
+
+The assembled executable will be named `dns_proxy_filter_p2B9agE1` and can be found in the `build/` folder.
+
+# Current limitation on Linux
+
+Since Linux (unlike macOS) usually does not come with pre-built Unix headers, additional steps are required to build them as C++20 modules for this C++23 app to compile.
 
 # How to use
 
-After navigating to the folder containing the executable, type its name ```./dns_proxy_filter_p2B9agE1``` and provide the path to the configuration file. For example:
-```
+After navigating to the folder containing the executable, type its name `./dns_proxy_filter_p2B9agE1` and provide the path to the configuration file. For example:
+```bash
 ./dns_proxy_filter_p2B9agE1 ~/Documents/.config/p2B9agE1.conf
 ```
+
 Alternatively, you may want to add its directory to your PATH to be able to launch it from anywhere in the terminal.
-```
+```bash
 export PATH=$PATH:/folder/you/want
 ```
+
 After the path to the configuration file, you may also specify the number of threads to use.
-```
+```bash
 ./dns_proxy_filter_p2B9agE1 ~/Documents/.config/p2B9agE1.conf 16
 ```
 
