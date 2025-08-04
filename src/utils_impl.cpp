@@ -8,6 +8,10 @@ module utils;
 #include <cstdio>
 #include <cctype>
 #include <cstdlib>
+#include <print>
+
+using std::print;
+using std::println;
 
 int isValidInteger(const char * str) {
     long nprocs = sysconf(_SC_NPROCESSORS_ONLN);
@@ -23,21 +27,21 @@ int isValidInteger(const char * str) {
 void hexPrint(const void * data, size_t len) {
     const unsigned char * byte = (const unsigned char *) data;
     for (size_t i = 0; i < len; i += 16) {
-        printf("%04zx  ", i);
+        print("{:04x}  ", i);
         for (size_t j = 0; j < 16; ++j) {
-            if (i + j < len) printf("%02x ", byte[i + j]);
-            else printf("   ");
+            if (i + j < len) print("{:02x} ", byte[i + j]);
+            else print("   ");
         }
-        printf("\t");
+        print("\t");
         for (size_t j = 0; j < 16; ++j) {
             if (i + j < len) {
                 unsigned char c = byte[i + j];
-                printf("%c", isprint(c) ? c : '.');
+                print("{}", isprint(c) ? c : '.');
             }
         }
-        puts("");
+        println("");
     }
-    puts("\n");
+    println("\n");
 }
 
 void parseDomainName(const char * buffer, char * output) {

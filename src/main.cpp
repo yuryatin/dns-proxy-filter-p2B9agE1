@@ -15,6 +15,12 @@ import <cstddef>;
 #include <cstdio>
 #include <cctype>
 #include <cstdlib>
+#include <iostream>
+#include <print>
+
+using std::print;
+using std::println;
+using std::cerr;
 
 const char * configFileName = NULL;
 int n_threads = 0;
@@ -49,7 +55,7 @@ void * workerThread(void *arg) {
 int main(int argc, char *argv[]) {
 
     if (argc > 1) configFileName = argv[1];
-    else puts("No path to a configuration file was provided. Proceeding with Default parameters.");
+    else println("No path to a configuration file was provided. Proceeding with Default parameters.");
 
     if (argc > 2) {
         int core_n = isValidInteger(argv[2]);
@@ -95,7 +101,7 @@ int main(int argc, char *argv[]) {
         upstream_addr[i].sin_family = AF_INET;
         upstream_addr[i].sin_port = htons(53);
         if (inet_pton(AF_INET, upStream.dns[i], &upstream_addr[i].sin_addr) <= 0) {
-            fprintf(stderr, "inet_pton for upstream dns #%d", i+1);
+            print(cerr, "inet_pton for upstream dns #{}", i+1);
             close(sockfd);
             exit(EXIT_FAILURE);
         }
@@ -130,7 +136,7 @@ int main(int argc, char *argv[]) {
         pthread_create(&threads[n_threads], NULL, workerThread, (void *) (intptr_t) upstream_socks[n_threads]);
     }
 
-    printf("Using %d threads. Listening for UDP packets on %s:%d...\n", n_threads, server.ip, server.port);
+    println("Using {} threads. Listening for UDP packets on {}:{}...", n_threads, server.ip, server.port);
     
     char readDomain[DOMLENGTH];
     char forIPv4[IPv4LEN];
@@ -153,7 +159,7 @@ int main(int argc, char *argv[]) {
         buffer[len] = '\0';
 
         struct DnsHeader * recv_header = (struct DnsHeader *) buffer;
-        printf("Query ID: %u\n", ntohs(recv_header->id));
+        println("Query ID: {}", ntohs(recv_header->id));
 
         parseDomainName(buffer, readDomain);
         if(inNotFind(readDomain, &(filter.notFind))) {
@@ -214,7 +220,7 @@ int main(int argc, char *argv[]) {
                 ++totalTaskCount;
             }
         }
-        printf("Received %zd bytes from %s:%d\n", len,
+        println("Received {} bytes from {}:{}", len,
                inet_ntoa(sender.sin_addr), ntohs(sender.sin_port));
     }
 

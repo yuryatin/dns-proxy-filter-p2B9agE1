@@ -3,9 +3,13 @@ module handlefilters;
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <print>
 
 import configreader;
 import utils;
+
+using std::print;
+using std::println;
 
 bool inNotFind(const char * domain, NotFind * notFind) {
     for (int i = 0; i < notFind->n; ++i)
@@ -48,7 +52,7 @@ void loadFiltersAndParams(const char * configFileName, Filter * filter, Server *
     scanConfigLines(f, false, filter, server, upStream);
     rewind(f);
     scanConfigLines(f, true, filter, server, upStream);
-    printf("\nThe parameters are loaded:\n\tDNS proxy filter should\n\t\tlisten at \n\t\t\tIP \t%s\n\t\t\tport \t%d\n\t\tforward DNS queries to:\n\t\t\t%s\n\t\t\t%s\n\t\t\t%s\n\n\tIt will\n\t\tnot find \t\t%d domains\n\t\trefuse to serve \t%d domains\n\n\tIt has\n\t\tpreconfigured IPv4 for \t%d domains\n\t\tpreconfigured IPv6 for \t%d domains\n\n", server->ip, server->port, upStream->dns[0], upStream->dns[1], upStream->dns[2], filter->notFind.n, filter->refuse.n, filter->preDefinedIPv4.n, filter->preDefinedIPv6.n);
+    println("\nThe parameters are loaded:\n\tDNS proxy filter should\n\t\tlisten at \n\t\t\tIP \t{}\n\t\t\tport \t{}\n\t\tforward DNS queries to:\n\t\t\t{}\n\t\t\t{}\n\t\t\t{}\n\n\tIt will\n\t\tnot find \t\t{} domains\n\t\trefuse to serve \t{} domains\n\n\tIt has\n\t\tpreconfigured IPv4 for \t{} domains\n\t\tpreconfigured IPv6 for \t{} domains\n", server->ip, server->port, upStream->dns[0], upStream->dns[1], upStream->dns[2], filter->notFind.n, filter->refuse.n, filter->preDefinedIPv4.n, filter->preDefinedIPv6.n);
 }
 
 void cleanFilter(Filter * filter) {
@@ -63,13 +67,13 @@ void cleanFilter(Filter * filter) {
 }
 
 void printFilters(Filter * filter) {
-    puts("\tThe filters\nDomains not to find:");
-    for (int i = 0; i < filter->notFind.n; ++i ) printf("%s\t", filter->notFind.domains[i].domain);
-    puts("\n\nDomains to refuse:");
-    for (int i = 0; i < filter->refuse.n; ++i ) printf("%s\t", filter->refuse.domains[i].domain);
-    puts("\n\nDomains with pre-defined IPv4:");
-    for (int i = 0; i < filter->preDefinedIPv4.n; ++i ) printf("%32s\t%s\n", filter->preDefinedIPv4.records[i].domain, filter->preDefinedIPv4.records[i].ip);
-    puts("\nDomains with pre-defined IPv6:");
-    for (int i = 0; i < filter->preDefinedIPv6.n; ++i ) printf("%32s\t%s\n", filter->preDefinedIPv6.records[i].domain, filter->preDefinedIPv6.records[i].ip);
-    puts("");
+    println("\tThe filters\nDomains not to find:");
+    for (int i = 0; i < filter->notFind.n; ++i ) print("{}\t", filter->notFind.domains[i].domain);
+    println("\n\nDomains to refuse:");
+    for (int i = 0; i < filter->refuse.n; ++i ) print("{}\t", filter->refuse.domains[i].domain);
+    println("\n\nDomains with pre-defined IPv4:");
+    for (int i = 0; i < filter->preDefinedIPv4.n; ++i ) println("{:>32}\t{}", filter->preDefinedIPv4.records[i].domain, filter->preDefinedIPv4.records[i].ip);
+    println("\nDomains with pre-defined IPv6:");
+    for (int i = 0; i < filter->preDefinedIPv6.n; ++i ) println("{:>32}\t{}", filter->preDefinedIPv6.records[i].domain, filter->preDefinedIPv6.records[i].ip);
+    println("");
 }

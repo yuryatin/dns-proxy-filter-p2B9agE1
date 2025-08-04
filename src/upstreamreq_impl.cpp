@@ -16,9 +16,7 @@ extern pthread_mutex_t queueMutex;
 extern pthread_cond_t taskAvailable;
 
 void forwardDNSquery(void (* func)(void *), void * arg) {
-    puts("in forwardDNSquery");
     ForwardArgs * args = (ForwardArgs *) arg;
-    printf("taskCount %d", * args->taskCountOverall);
     pthread_mutex_lock(args->queueMutex);
     if (*(args->taskCountOverall) < MAX_TASKS) {
         args->task_queue[*(args->taskCountOverall)].function = func;
@@ -30,7 +28,6 @@ void forwardDNSquery(void (* func)(void *), void * arg) {
 }
 
 void forward(void * arg) {
-    puts("in forward");
     ForwardArgs * args = (ForwardArgs *) arg;
     if (sendto(args->upstream_sock, args->buffer, args->len, 0,  (struct sockaddr *) &(args->upstream_addr[args->taskCount % 3]), sizeof(args->upstream_addr[args->taskCount % 3])) < 0) {
         perror("sendto upstream");
@@ -55,5 +52,5 @@ void forward(void * arg) {
     }
 
     free(args->buffer);
-    free(args);
+    delete args;
 }
