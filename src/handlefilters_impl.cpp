@@ -4,29 +4,31 @@ module handlefilters;
 #include <cstdlib>
 #include <cstring>
 #include <print>
+#include <ranges>
 
 import configreader;
 import utils;
 
 using std::print;
 using std::println;
+namespace vw = std::views;
 
 bool inNotFind(const char * domain, NotFind * notFind) {
-    for (int i = 0; i < notFind->n; ++i)
+    for (int i : vw::iota(0, notFind->n))
         if (strcasecmp(domain, notFind->domains[i].domain) == 0)
             return true;
     return false;
 }
 
 bool inRefuse(const char * domain, Refuse * refuse) {
-    for (int i = 0; i < refuse->n; ++i)
+    for (int i : vw::iota(0, refuse->n))
         if (strcasecmp(domain, refuse->domains[i].domain) == 0) 
             return true;
     return false;
 }
 
 bool inPreDefinedIPv4(const char * domain, ArrayPreDefinedIPv4 * arrayPreDefinedIPv4, char * ipv4) {
-    for (int i = 0; i < arrayPreDefinedIPv4->n; ++i)
+    for (int i : vw::iota(0, arrayPreDefinedIPv4->n))
         if (strcasecmp(domain, arrayPreDefinedIPv4->records[i].domain) == 0) {
             strcpy(ipv4, arrayPreDefinedIPv4->records[i].ip);
             return true;
@@ -35,7 +37,7 @@ bool inPreDefinedIPv4(const char * domain, ArrayPreDefinedIPv4 * arrayPreDefined
 }
 
 bool inPreDefinedIPv6(const char * domain, ArrayPreDefinedIPv6 * arrayPreDefinedIPv6, char * ipv6) {
-    for (int i = 0; i < arrayPreDefinedIPv6->n; ++i)
+    for (int i : vw::iota(0, arrayPreDefinedIPv6->n))
         if (strcasecmp(domain, arrayPreDefinedIPv6->records[i].domain) == 0) {
             strcpy(ipv6, arrayPreDefinedIPv6->records[i].ip);
             return true;
@@ -68,12 +70,12 @@ void cleanFilter(Filter * filter) {
 
 void printFilters(Filter * filter) {
     println("\tThe filters\nDomains not to find:");
-    for (int i = 0; i < filter->notFind.n; ++i ) print("{}\t", filter->notFind.domains[i].domain);
+    for (int i : vw::iota(0, filter->notFind.n)) print("{}\t", filter->notFind.domains[i].domain);
     println("\n\nDomains to refuse:");
-    for (int i = 0; i < filter->refuse.n; ++i ) print("{}\t", filter->refuse.domains[i].domain);
+    for (int i : vw::iota(0, filter->refuse.n)) print("{}\t", filter->refuse.domains[i].domain);
     println("\n\nDomains with pre-defined IPv4:");
-    for (int i = 0; i < filter->preDefinedIPv4.n; ++i ) println("{:>32}\t{}", filter->preDefinedIPv4.records[i].domain, filter->preDefinedIPv4.records[i].ip);
+    for (int i : vw::iota(0, filter->preDefinedIPv4.n)) println("{:>32}\t{}", filter->preDefinedIPv4.records[i].domain, filter->preDefinedIPv4.records[i].ip);
     println("\nDomains with pre-defined IPv6:");
-    for (int i = 0; i < filter->preDefinedIPv6.n; ++i ) println("{:>32}\t{}", filter->preDefinedIPv6.records[i].domain, filter->preDefinedIPv6.records[i].ip);
+    for (int i : vw::iota(0, filter->preDefinedIPv6.n)) println("{:>32}\t{}", filter->preDefinedIPv6.records[i].domain, filter->preDefinedIPv6.records[i].ip);
     println("");
 }

@@ -9,9 +9,12 @@ module utils;
 #include <cctype>
 #include <cstdlib>
 #include <print>
+#include <ranges>
+#include <algorithm>
 
 using std::print;
 using std::println;
+namespace vw = std::views;
 
 int isValidInteger(const char * str) {
     long nprocs = sysconf(_SC_NPROCESSORS_ONLN);
@@ -28,12 +31,12 @@ void hexPrint(const void * data, size_t len) {
     const unsigned char * byte = (const unsigned char *) data;
     for (size_t i = 0; i < len; i += 16) {
         print("{:04x}  ", i);
-        for (size_t j = 0; j < 16; ++j) {
+        for (size_t j : vw::iota(0, 16)) {
             if (i + j < len) print("{:02x} ", byte[i + j]);
             else print("   ");
         }
         print("\t");
-        for (size_t j = 0; j < 16; ++j) {
+        for (size_t j : vw::iota(0, 16)) {
             if (i + j < len) {
                 unsigned char c = byte[i + j];
                 print("{}", isprint(c) ? c : '.');
@@ -49,7 +52,7 @@ void parseDomainName(const char * buffer, char * output) {
     size_t end = 0;
     while (buffer[pos] != 0) {
         int label_len = buffer[pos++];
-        for (int i = 0; i < label_len; i++)
+        for ([[maybe_unused]] int _ : vw::iota(0, label_len))
             output[end++] = buffer[pos++];
         output[end++] = '.';
         if (pos >= DOMLENGTH) break;
@@ -60,9 +63,9 @@ void parseDomainName(const char * buffer, char * output) {
 
 const char * findEndOfQuestions(const char * startOfQuestions, int nQuestions) {
     const char * p = startOfQuestions;
-    for (int i = 0; i < nQuestions; ++i) {
+    std::ranges::for_each(std::views::iota(0, nQuestions), [&](int) {
         while (*p != 0) p += (*p) + 1;
         p += 5;
-    }
+    });
     return p;
 }

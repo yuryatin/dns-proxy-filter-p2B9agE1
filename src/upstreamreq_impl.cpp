@@ -8,6 +8,7 @@ module upstreamreq;
 #include <cstdio>
 #include <cstdlib>
 #include <cctype>
+#include <array>
 
 import configreader;
 
@@ -29,7 +30,7 @@ void forwardDNSquery(void (* func)(void *), void * arg) {
 
 void forward(void * arg) {
     ForwardArgs * args = (ForwardArgs *) arg;
-    if (sendto(args->upstream_sock, args->buffer, args->len, 0,  (struct sockaddr *) &(args->upstream_addr[args->taskCount % 3]), sizeof(args->upstream_addr[args->taskCount % 3])) < 0) {
+    if (sendto(args->upstream_sock, args->buffer, args->len, 0,  (struct sockaddr *) &(args->upstream_addr.at(args->taskCount % 3)), sizeof(args->upstream_addr.at(args->taskCount % 3))) < 0) {
         perror("sendto upstream");
         close(args->upstream_sock);
         exit(EXIT_FAILURE);

@@ -8,6 +8,9 @@ export module utils;
 #include <cstdio>
 #include <cctype>
 #include <cstdlib>
+#include <array>
+
+using std::array;
 
 export inline constexpr size_t DNS_HEADER_SIZE = 12;
 export inline constexpr size_t DOMLENGTH = 256;
@@ -41,13 +44,13 @@ export struct ForwardArgs {
     int upstream_sock;
     const int sockfd;
     int * taskCountOverall;
-    sockaddr_in * upstream_addr;
+    array<sockaddr_in, N_UPSTREAM_DNS> upstream_addr;
     task_t * task_queue;
     pthread_mutex_t * queueMutex;
     pthread_cond_t * taskAvailable;
     ForwardArgs(int &_sockfd, 
                 int * _taskCountOverall,
-                sockaddr_in * _upstream_addr,
+                const array<sockaddr_in, N_UPSTREAM_DNS> &_upstream_addr,
                 task_t * _task_queue,
                 pthread_mutex_t * _queueMutex,
                 pthread_cond_t * _taskAvailable) : sockfd(_sockfd),

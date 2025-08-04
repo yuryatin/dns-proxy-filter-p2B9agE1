@@ -17,21 +17,25 @@ import <cstddef>;
 #include <cstdlib>
 #include <iostream>
 #include <print>
+#include <array>
+#include <vector>
+#include <ranges>
 
 using std::print;
 using std::println;
 using std::cerr;
+using std::array;
+namespace vw = std::views;
 
 const char * configFileName = NULL;
 int n_threads = 0;
 
 int sockfd;
 struct sockaddr_in addr;
-struct sockaddr_in upstream_addr[N_UPSTREAM_DNS];
+array<sockaddr_in, N_UPSTREAM_DNS> upstream_addr;
 
 int taskCount = 0;
 int totalTaskCount = 0;
-int * upstream_socks = NULL;
 int thread_pool_size = 24;
 task_t task_queue[MAX_TASKS];
 pthread_mutex_t queueMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -97,10 +101,10 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    for (int i = 0; i < N_UPSTREAM_DNS; i++) {
-        upstream_addr[i].sin_family = AF_INET;
-        upstream_addr[i].sin_port = htons(53);
-        if (inet_pton(AF_INET, upStream.dns[i], &upstream_addr[i].sin_addr) <= 0) {
+    for (int i : vw::iota(0, N_UPSTREAM_DNS)) {
+        upstream_addr.at(i).sin_family = AF_INET;
+        upstream_addr.at(i).sin_port = htons(53);
+        if (inet_pton(AF_INET, upStream.dns[i], &upstream_addr.at(i).sin_addr) <= 0) {
             print(cerr, "inet_pton for upstream dns #{}", i+1);
             close(sockfd);
             exit(EXIT_FAILURE);
@@ -114,26 +118,19 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    upstream_socks = (int *) malloc(sizeof(int) * thread_pool_size);
-    if (!upstream_socks) {
-        perror("malloc for upstream_socks failed");
-        free(threads);
-        close(sockfd);
-        exit(EXIT_FAILURE);
-    }
+    std::vector<int> upstream_socks(thread_pool_size);
 
-    for (n_threads = 0; n_threads < thread_pool_size; n_threads++) {
-        upstream_socks[n_threads] = socket(AF_INET, SOCK_DGRAM, 0);
-        if (upstream_socks[n_threads] < 0) {
-            if (!n_threads) {
+    for (auto n_thread : vw::iota(0, thread_pool_size) ) {
+        upstream_socks.at(n_thread) = socket(AF_INET, SOCK_DGRAM, 0);
+        if (upstream_socks[n_thread] < 0) {
+            if (!n_thread) {
                 perror("socket");
                 free(threads);
-                free(upstream_socks);
                 close(sockfd);
                 exit(EXIT_FAILURE);
             } else break;
         }
-        pthread_create(&threads[n_threads], NULL, workerThread, (void *) (intptr_t) upstream_socks[n_threads]);
+        pthread_create(&threads[n_thread], NULL, workerThread, (void *) (intptr_t) upstream_socks.at(n_thread));
     }
 
     println("Using {} threads. Listening for UDP packets on {}:{}...", n_threads, server.ip, server.port);
@@ -196,9 +193,9 @@ int main(int argc, char *argv[]) {
                                                         &queueMutex,
                                                         &taskAvailable);
             
-            for (int dns = 0; dns < N_UPSTREAM_DNS; ++dns)
-                forwardArgs->upstream_addr[dns] = upstream_addr[dns];
-            for (int ta = 0; ta < MAX_TASKS; ++ta)
+            for (auto dns : vw::iota(0, N_UPSTREAM_DNS))
+                forwardArgs->upstream_addr.at(dns) = upstream_addr.at(dns);
+            for (auto ta : vw::iota(0, MAX_TASKS))
                 forwardArgs->task_queue[ta] = task_queue[ta];
 
             forwardArgs->sender_len = sender_len;
@@ -226,12 +223,11 @@ int main(int argc, char *argv[]) {
 
     cleanFilter(&filter);
     close(sockfd);
-    for (int i = 0; i < n_threads; i++)
+    for (int i : vw::iota(0, n_threads))
         pthread_cancel(threads[i]);
     free(threads);
-    free(upstream_socks);
     pthread_mutex_destroy(&queueMutex);
-    for (int i = 0; i < n_threads; i++)
+    for (int i : vw::iota(0, n_threads))
         close(upstream_socks[i]);
     return 0;
 }
