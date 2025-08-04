@@ -1,8 +1,8 @@
 export module handlefilters;
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+import <cstdio>;
+import <cstdlib>;
+import <cstring>;
 
 import configreader;
 

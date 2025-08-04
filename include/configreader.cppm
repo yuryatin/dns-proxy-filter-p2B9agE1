@@ -1,11 +1,11 @@
 export module configreader;
 
-#include <cstdio>
+import <cstdio>;
 
 import utils;
 
-export inline constexpr size_t IPv4LEN = 16;
-export inline constexpr size_t IPv6LEN = 40;
+export inline constexpr std::size_t IPv4LEN = 16;
+export inline constexpr std::size_t IPv6LEN = 40;
 export inline constexpr int QTYPE_A = 1;
 export inline constexpr int QTYPE_AAAA = 28;
 

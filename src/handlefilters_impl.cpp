@@ -1,10 +1,10 @@
 module handlefilters;
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <print>
-#include <ranges>
+import <cstdio>;
+import <cstdlib>;
+import <cstring>;
+import <print>;
+import <ranges>;
 
 import configreader;
 import utils;

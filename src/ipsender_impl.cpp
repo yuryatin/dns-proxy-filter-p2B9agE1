@@ -1,8 +1,9 @@
 module ipsender;
 
+import <cstring>;
+
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <cstring>
 
 import configreader;
 
@@ -41,7 +42,7 @@ void sendPreDefinedIP(DnsHeader * recv_header, char * forIP, ForwardArgs * sende
     // RDLENGTH = 4 (IPv4) or RDLENGTH = 16 (IPv6)
     *p++ = 0x00;
     *p++ = isIPv6 ? 0x10 : 0x04;
-    size_t responseSize;
+    std::size_t responseSize;
     if (isIPv6) {   // RDATA = IPv6 address in 16 bytes
         struct in6_addr ip6_addr;
         inet_pton(AF_INET6, forIP, &ip6_addr);

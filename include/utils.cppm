@@ -1,20 +1,20 @@
 export module utils;
 
+import <cstring>;
+import <cstdio>;
+import <cctype>;
+import <cstdlib>;
+import <array>;
+
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <strings.h>
 
-#include <cstring>
-#include <cstdio>
-#include <cctype>
-#include <cstdlib>
-#include <array>
-
 using std::array;
 
-export inline constexpr size_t DNS_HEADER_SIZE = 12;
-export inline constexpr size_t DOMLENGTH = 256;
-export inline constexpr size_t BUFFER_SIZE = 4096;
+export inline constexpr std::size_t DNS_HEADER_SIZE = 12;
+export inline constexpr std::size_t DOMLENGTH = 256;
+export inline constexpr std::size_t BUFFER_SIZE = 4096;
 export inline constexpr int N_UPSTREAM_DNS = 3;
 export inline constexpr int MAX_TASKS = 100;
 
@@ -62,6 +62,6 @@ export struct ForwardArgs {
 };
 
 export int isValidInteger(const char *str);
-export void hexPrint(const void * data, size_t len);
+export void hexPrint(const void * data, std::size_t len);
 export void parseDomainName(const char * buffer, char * output);
 export const char * findEndOfQuestions(const char * startOfQuestions, int nQuestions);

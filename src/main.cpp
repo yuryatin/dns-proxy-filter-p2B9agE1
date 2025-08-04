@@ -1,9 +1,12 @@
-import handlefilters;
-import upstreamreq;
-import utils;
-import configreader;
-import ipsender;
-import <cstddef>;
+import <print>;
+import <iostream>;
+import <array>;
+import <vector>;
+import <ranges>;
+import <cstring>;
+import <cstdio>;
+import <cctype>;
+import <cstdlib>;
 
 #include <unistd.h>
 #include <netinet/in.h>
@@ -11,15 +14,11 @@ import <cstddef>;
 #include <arpa/inet.h>
 #include <pthread.h>
 
-#include <cstring>
-#include <cstdio>
-#include <cctype>
-#include <cstdlib>
-#include <iostream>
-#include <print>
-#include <array>
-#include <vector>
-#include <ranges>
+import handlefilters;
+import upstreamreq;
+import utils;
+import configreader;
+import ipsender;
 
 using std::print;
 using std::println;

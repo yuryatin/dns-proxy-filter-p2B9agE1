@@ -1,13 +1,13 @@
 export module upstreamreq;
 
+import <cstdio>;
+import <cstdlib>;
+import <cctype>;
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <unistd.h>
-
-#include <cstdio>
-#include <cstdlib>
-#include <cctype>
 
 import utils;
 

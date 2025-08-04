@@ -1,16 +1,16 @@
 module utils;
 
+import <cstring>;
+import <cstdio>;
+import <cctype>;
+import <cstdlib>;
+import <print>;
+import <ranges>;
+import <algorithm>;
+
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <strings.h>
-
-#include <cstring>
-#include <cstdio>
-#include <cctype>
-#include <cstdlib>
-#include <print>
-#include <ranges>
-#include <algorithm>
 
 using std::print;
 using std::println;
@@ -27,16 +27,16 @@ int isValidInteger(const char * str) {
     return val;
 }
 
-void hexPrint(const void * data, size_t len) {
+void hexPrint(const void * data, std::size_t len) {
     const unsigned char * byte = (const unsigned char *) data;
-    for (size_t i = 0; i < len; i += 16) {
+    for (std::size_t i = 0; i < len; i += 16) {
         print("{:04x}  ", i);
-        for (size_t j : vw::iota(0, 16)) {
+        for (std::size_t j : vw::iota(0, 16)) {
             if (i + j < len) print("{:02x} ", byte[i + j]);
             else print("   ");
         }
         print("\t");
-        for (size_t j : vw::iota(0, 16)) {
+        for (std::size_t j : vw::iota(0, 16)) {
             if (i + j < len) {
                 unsigned char c = byte[i + j];
                 print("{}", isprint(c) ? c : '.');
@@ -48,8 +48,8 @@ void hexPrint(const void * data, size_t len) {
 }
 
 void parseDomainName(const char * buffer, char * output) {
-    size_t pos = DNS_HEADER_SIZE;
-    size_t end = 0;
+    std::size_t pos = DNS_HEADER_SIZE;
+    std::size_t end = 0;
     while (buffer[pos] != 0) {
         int label_len = buffer[pos++];
         for ([[maybe_unused]] int _ : vw::iota(0, label_len))

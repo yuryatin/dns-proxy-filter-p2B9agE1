@@ -1,14 +1,14 @@
 module upstreamreq;
 
+import <cstdio>;
+import <cstdlib>;
+import <cctype>;
+import <array>;
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <unistd.h>
-
-#include <cstdio>
-#include <cstdlib>
-#include <cctype>
-#include <array>
 
 import configreader;
 
@@ -17,6 +17,7 @@ extern pthread_mutex_t queueMutex;
 extern pthread_cond_t taskAvailable;
 
 void forwardDNSquery(void (* func)(void *), void * arg) {
+    [[assume(arg != nullptr)]];
     ForwardArgs * args = (ForwardArgs *) arg;
     pthread_mutex_lock(args->queueMutex);
     if (*(args->taskCountOverall) < MAX_TASKS) {
